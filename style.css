@@ -1,0 +1,172 @@
+body {
+  font-family: 'Roboto Condensed', sans-serif;
+  background-color: #3d3d3d;
+  color: #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  margin: 0;
+  overflow-x: hidden;
+}
+.tela {
+  width: 100%; max-width: 900px; min-height: 90vh;
+  padding: 20px;
+  background-color: #2a2a2a;
+  border: 4px solid #1e1e1e;
+  border-radius: 12px;
+  box-shadow: 0 0 25px rgba(0,0,0,0.6);
+  text-align: center;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.oculto { display: none !important; }
+h1 { font-family: 'Special Elite', cursive; color: #FFD700; text-shadow: 1px 1px 2px #000;}
+h2, h3 { font-family: 'Special Elite', cursive; color: #ff8c6b; }
+
+button, .botao-like {
+  background-color: #5a4a3a; color: #f0e0d0;
+  padding: 10px 20px; border: 2px solid #4a3a2a; border-radius: 6px;
+  cursor: pointer; font-size: 1.05em; margin: 8px 5px;
+  transition: background-color 0.3s, transform 0.1s;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.4);
+  display: inline-block; text-align: center;
+  font-family: 'Special Elite', cursive;
+}
+button:hover, .botao-like:hover { background-color: #7a6a5a; transform: translateY(-1px); }
+button:active, .botao-like:active { transform: translateY(0); }
+button:disabled, .botao-like:disabled {
+  background-color: #444; color: #888; cursor: not-allowed;
+  border-color: #333; transform: translateY(0);
+}
+
+.cartao-personagem {
+  background-color: #4a4a4a; padding: 10px; border-radius: 6px; margin-bottom: 8px;
+  border-left: 5px solid #ff8c6b; text-align: left; color: #d0d0d0;
+}
+.cartao-personagem.morto { opacity: 0.6; border-left-color: #777; background-color: #3a3a3a; }
+.cartao-personagem.em-expedicao { border-left-color: #6babf0; background-color: #425061; opacity: 0.85; }
+.cartao-personagem p { margin: 2px 0; font-size: 0.9em; }
+.cartao-personagem h4 { color: #f0e0d0; font-size: 1.1em;}
+
+.display-recurso {
+  font-size: 1.1em; margin: 8px 0; padding: 8px;
+  background-color: #383838; border: 1px solid #555; border-radius: 4px;
+  font-family: 'Special Elite', cursive; color: #FFD700;
+}
+.display-recurso span { color: #f0f0f0; }
+
+.conteudo-modal-evento, .conteudo-diario-acoes {
+  background-color: #c2b280; color: #3a2e27;
+  padding: 25px; border-radius: 8px; box-shadow: 0 0 20px rgba(0,0,0,0.7);
+  width: 90%; max-width: 600px;
+  max-height: 85vh; overflow-y: auto;
+  border: 3px solid #5a4a3a;
+  display: flex; flex-direction: column;
+  position: relative;
+}
+.conteudo-modal-evento h3, .conteudo-diario-acoes h3 {color: #7a3b2e;}
+.conteudo-modal-evento button, .conteudo-diario-acoes button:not(#botao-fechar-diario) {
+  background-color: #7a6a5a; color: #f0e0d0; border-color: #5a4a3a;
+}
+.conteudo-modal-evento button:hover, .conteudo-diario-acoes button:not(#botao-fechar-diario):hover {
+  background-color: #8a7a6a;
+}
+.conteudo-diario-acoes .pagina-diario { min-height: 300px; }
+
+#placeholder-imagem-evento { width: 100%; height: 180px; background-color: #5a4a3a; border-radius: 4px; margin-bottom: 15px;
+  display: flex; align-items: center; justify-content: center; color: #f0e0d0; overflow: hidden; border: 1px solid #4a3a2a;}
+#placeholder-imagem-evento img { width: 100%; height: 100%; object-fit: cover; }
+
+#imagem-splash { width: 100%; max-width: 500px; height: auto; border-radius: 8px; margin: 20px auto; display: block; border: 3px solid #4a3b31; }
+
+#lista-inventario li {
+  color: #c0c0c0; padding: 3px 5px; margin: 2px 0;
+  border-bottom: 1px dashed #666; font-size: 0.9em;
+}
+#lista-inventario li:last-child { border-bottom: none; }
+
+#conteudo-mensagem-resultado {
+  background-color: #2a2a2a; color: #f0e0d0;
+  padding: 30px; border-radius: 8px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.8);
+  text-align: center; width: 90%; max-width: 480px;
+  border: 3px solid #FFD700; font-family: 'Roboto Condensed', sans-serif;
+}
+#conteudo-mensagem-resultado h3 {
+  font-family: 'Special Elite', cursive; color: #FFD700;
+  font-size: 1.75rem; margin-bottom: 1rem;
+}
+#conteudo-mensagem-resultado p { font-size: 1.1rem; line-height: 1.6; margin-bottom: 1.5rem; }
+#conteudo-mensagem-resultado button {
+  background-color: #FFD700; color: #3a2e27; font-weight: bold;
+  font-family: 'Special Elite', cursive; padding: 10px 20px;
+  border-radius: 6px; border: 2px solid #4a3a2a;
+  transition: background-color 0.3s, transform 0.1s;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.4);
+}
+#conteudo-mensagem-resultado button:hover { background-color: #ffec80; transform: translateY(-1px); }
+
+#container-botoes-acao button { margin-top: 10px; }
+
+.form-checkbox { appearance: none; width: 1.1em; height: 1.1em; border: 2px solid #888; border-radius: 0.15em;
+  display: inline-block; position: relative; cursor: pointer; vertical-align: middle; background-color: #555; }
+.form-checkbox:checked { background-color: #ff8c6b; border-color: #ff6b6b;}
+.form-checkbox:checked::after { content: 'X'; font-size: 0.9em; color: #2d2d2d; font-weight:bold;
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
+.form-checkbox:disabled { background-color: #333; cursor: not-allowed; border-color: #444; }
+
+.cartao-dist-personagem, .cartao-exp-personagem {
+  background-color: #d2b48c; color: #4a3b2a;
+  border: 1px solid #a08464; padding: 10px; margin-bottom: 8px; border-radius: 4px; text-align: left;
+}
+.cartao-dist-personagem h4, .cartao-exp-personagem h4 { color: #5a2a27; }
+.cartao-dist-personagem .form-checkbox {border-color: #7a6a5a; background-color: #b0a090;}
+.cartao-dist-personagem .form-checkbox:checked {background-color: #ff8c6b; border-color: #e06c4b;}
+.cartao-dist-personagem .form-checkbox:checked::after {color: #4a3b2a;}
+.cartao-exp-personagem .form-radio {
+  margin-right: 8px;
+  accent-color: #ff8c6b;
+}
+
+#log-eventos {
+  text-align: left; padding: 15px; background-color: #f5e8c8; color: #4a3b2a;
+  border: 2px dashed #a08464; border-radius: 6px; height: 160px;
+  overflow-y: auto; margin-bottom: 15px; font-size: 0.95em;
+  line-height: 1.6; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);
+}
+#log-eventos p { padding-bottom: 4px; border-bottom: 1px solid #d2b48c; margin-bottom: 4px; }
+#log-eventos p:last-child {border-bottom: none;}
+
+#tela-transicao-dia h1 { font-family: 'Special Elite', cursive; }
+
+#modal-diario-acoes .titulo-pagina-diario {
+  font-family: 'Special Elite', cursive;
+  color: #5a2a27;
+  font-size: 1.8rem; margin-bottom: 1rem;
+  padding-bottom: 0.5rem; border-bottom: 2px dashed #a08464;
+}
+#modal-diario-acoes .navegacao-diario {
+  display: flex; justify-content: space-between;
+  margin-top: auto; padding-top: 15px;
+  border-top: 1px solid #a08464;
+}
+.pagina-diario:not(.pagina-ativa) { display: none; }
+
+#botao-fechar-diario {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: transparent;
+  color: #5a4a3a;
+  border: none;
+  font-size: 1.5rem;
+  font-weight: bold;
+  padding: 0 8px;
+  line-height: 1;
+  cursor: pointer;
+  box-shadow: none;
+  margin: 0;
+  font-family: Arial, sans-serif;
+}
+#botao-fechar-diario:hover {
+  color: #7a3b2e;}
