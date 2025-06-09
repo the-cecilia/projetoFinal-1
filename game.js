@@ -5,6 +5,7 @@ const telaSplash = document.getElementById('tela-splash'),
       telaDificuldade = document.getElementById('tela-dificuldade'),
       telaJogo = document.getElementById('tela-jogo'),
       telaFimDeJogo = document.getElementById('tela-fim-de-jogo'),
+      telaVitoria = document.getElementById('tela-vitoria'), // Nova tela de vitória
       modalEvento = document.getElementById('modal-evento');
 
 const telaTransicaoDia = document.getElementById('tela-transicao-dia');
@@ -37,7 +38,8 @@ const botaoIniciar = document.getElementById('botao-iniciar'),
       botoesVoltarSplash = document.querySelectorAll('.voltar-para-splash'),
       botaoVoltarSplashDificuldade = document.getElementById('voltar-splash-da-dificuldade'),
       botoesDificuldade = document.querySelectorAll('.botao-dificuldade'),
-      botaoReiniciarJogo = document.getElementById('botao-reiniciar-jogo');
+      botaoReiniciarJogo = document.getElementById('botao-reiniciar-jogo'),
+      botaoJogarNovamenteVitoria = document.getElementById('botao-jogar-novamente-vitoria'); // Novo botão
 
 const displayContadorDias = document.getElementById('contador-dias'),
       displayContadorComida = document.getElementById('contador-comida'),
@@ -56,10 +58,15 @@ const displayTituloResultado = document.getElementById('titulo-resultado'),
 
 const displayContagemFinalDias = document.getElementById('contagem-final-dias'),
       displayMensagemFimJogo = document.getElementById('mensagem-fim-de-jogo');
+// Novos displays para a tela de vitória
+const displayMensagemVitoria = document.getElementById('mensagem-vitoria'),
+      displayContagemFinalDiasVitoria = document.getElementById('contagem-final-dias-vitoria');
+
 
 // --- Estado e Configuração do Jogo ---
 let estadoJogo = {};
 
+const DIAS_PARA_VENCER = 20; // CONDIÇÃO DE VITÓRIA
 const DIAS_PARA_MORRER_FOME_SEDE = 5;
 const MORAL_INICIAL = 80;
 const MUDANCA_MORAL_FOME_SEDE = -5;
@@ -339,7 +346,7 @@ const eventos = [
 // --- Lógica Central do Jogo ---
 function mostrarTela(idTela) {
     [telaSplash, telaConfiguracoes, telaCreditos, telaDificuldade, telaJogo,
-     telaFimDeJogo, modalEvento, sobreposicaoModalResultado, telaTransicaoDia, modalDiarioAcoes].forEach(t => {
+     telaFimDeJogo, telaVitoria, modalEvento, sobreposicaoModalResultado, telaTransicaoDia, modalDiarioAcoes].forEach(t => {
         if (t) t.classList.add('oculto');
     });
     const telaParaMostrar = document.getElementById(idTela);
@@ -422,26 +429,28 @@ function atualizarInterface() {
     displayPersonagens.innerHTML = '';
     estadoJogo.personagens.forEach(personagem => {
         const divPersonagem = document.createElement('div');
-        divPersonagem.className = 'cartao-personagem p-3 rounded shadow-md';
+        divPersonagem.className = 'cartao-personagem';
         if (!personagem.vivo) divPersonagem.classList.add('morto');
         else if (personagem.emExpedicao) divPersonagem.classList.add('em-expedicao');
 
-        let corStatus = 'text-green-400';
-        if (personagem.status === 'Doente') corStatus = 'text-yellow-400';
-        else if (personagem.status === 'Levemente Ferido') corStatus = 'text-orange-400';
-        else if (personagem.status === 'Gravemente Ferido') corStatus = 'text-red-500';
+        // Lógica para classes de status semânticas
+        let classeStatus = 'status-saudavel';
+        if (personagem.status === 'Doente') classeStatus = 'status-doente';
+        else if (personagem.status === 'Levemente Ferido') classeStatus = 'status-ferido-leve';
+        else if (personagem.status === 'Gravemente Ferido') classeStatus = 'status-ferido-grave';
 
-        let corMoral = 'text-lime-300';
-        if (personagem.moral < 30) corMoral = 'text-red-400';
-        else if (personagem.moral < 50) corMoral = 'text-yellow-400';
-        else if (personagem.moral < 70) corMoral = 'text-amber-300';
+        // Lógica para classes de moral semânticas
+        let classeMoral = 'moral-alta';
+        if (personagem.moral < 30) classeMoral = 'moral-critica';
+        else if (personagem.moral < 50) classeMoral = 'moral-baixa';
+        else if (personagem.moral < 70) classeMoral = 'moral-media';
 
         divPersonagem.innerHTML = `
-            <h4 class="text-md font-bold">${personagem.nome} ${personagem.emExpedicao ? `(Em Expedição - Ret. Dia ${estadoJogo.diaRetornoExpedicao})` : ""}</h4>
-            <p>Status: <span class="${corStatus}">${personagem.status}</span></p>
-            <p>Moral: <span class="${corMoral}">${personagem.moral}/100</span></p>
+            <h4>${personagem.nome} ${personagem.emExpedicao ? `(Em Expedição - Ret. Dia ${estadoJogo.diaRetornoExpedicao})` : ""}</h4>
+            <p>Status: <span class="${classeStatus}">${personagem.status}</span></p>
+            <p>Moral: <span class="${classeMoral}">${personagem.moral}/100</span></p>
             ${personagem.vivo && !personagem.emExpedicao ? `<p>Dias s/ Comida: ${personagem.diasSemComida}</p><p>Dias s/ Água: ${personagem.diasSemAgua}</p>` : ''}
-            ${!personagem.vivo ? '<p class="text-red-300 font-bold">MORREU</p>' : ''}
+            ${!personagem.vivo ? `<p class="status-morto">MORREU</p>` : ''}
         `;
         displayPersonagens.appendChild(divPersonagem);
     });
@@ -573,14 +582,14 @@ function preencherPaginaDistribuicaoDiario() {
         const divPersonagem = document.createElement('div');
         divPersonagem.className = 'cartao-dist-personagem';
         divPersonagem.innerHTML = `
-            <h4 class="font-bold">${personagem.nome} <span class="text-sm">(${personagem.status}, M:${personagem.moral}, C:${personagem.diasSemComida}, A:${personagem.diasSemAgua})</span></h4>
-            <label class="inline-flex items-center mr-3">
+            <h4>${personagem.nome} <span>(${personagem.status}, M:${personagem.moral}, C:${personagem.diasSemComida}, A:${personagem.diasSemAgua})</span></h4>
+            <label>
                 <input type="checkbox" id="diario-alimentar-${personagem.id}" class="form-checkbox" ${estadoJogo.comida === 0 ? 'disabled' : ''}>
-                <span class="ml-1">Comida (1)</span>
+                <span>Comida (1)</span>
             </label>
-            <label class="inline-flex items-center">
+            <label>
                 <input type="checkbox" id="diario-agua-${personagem.id}" class="form-checkbox" ${estadoJogo.agua === 0 ? 'disabled' : ''}>
-                <span class="ml-1">Água (1)</span>
+                <span>Água (1)</span>
             </label>
         `;
         containerPersonagensDistDiario.appendChild(divPersonagem);
@@ -606,7 +615,7 @@ function preencherPaginaExpedicaoDiario() {
     const disponiveisParaExpedicao = estadoJogo.personagens.filter(p => p.vivo && !p.emExpedicao);
 
     if (disponiveisParaExpedicao.length === 0) {
-         containerPersonagensExpDiario.innerHTML = '<p class="text-center text-lg py-4">Ninguém disponível para expedição.</p>';
+         containerPersonagensExpDiario.innerHTML = '<p>Ninguém disponível para expedição.</p>';
          estadoJogo.selecoesTemporariasDiario.expedicao = null;
          return;
     }
@@ -615,18 +624,18 @@ function preencherPaginaExpedicaoDiario() {
         const divPersonagem = document.createElement('div');
         divPersonagem.className = 'cartao-exp-personagem';
         divPersonagem.innerHTML = `
-            <label class="w-full flex items-center p-2 hover:bg-gray-700 rounded cursor-pointer">
-                <input type="radio" name="diario-expedicao-personagem" value="${personagem.id}" class="form-radio mr-3">
+            <label>
+                <input type="radio" name="diario-expedicao-personagem" value="${personagem.id}" class="form-radio">
                 <span>${personagem.nome} (Status: ${personagem.status}, Moral: ${personagem.moral})</span>
             </label>
         `;
         containerPersonagensExpDiario.appendChild(divPersonagem);
     });
      const divNinguem = document.createElement('div');
-     divNinguem.className = 'cartao-exp-personagem mt-4 border-t-2 border-dashed border-gray-600 pt-2';
+     divNinguem.className = 'cartao-exp-personagem';
      divNinguem.innerHTML = `
-        <label class="w-full flex items-center p-2 hover:bg-gray-700 rounded cursor-pointer">
-            <input type="radio" name="diario-expedicao-personagem" value="none" class="form-radio mr-3" checked>
+        <label>
+            <input type="radio" name="diario-expedicao-personagem" value="none" class="form-radio" checked>
             <span>Não enviar ninguém desta vez.</span>
         </label>
     `;
@@ -711,17 +720,27 @@ function avancarParaProximoDia() {
         displayLogEventos.innerHTML = '';
     }
 
+    if (estadoJogo.dia === 0) {
+        estadoJogo.dia = 1;
+    } else {
+        estadoJogo.dia++;
+    }
+
+    // LÓGICA DE VITÓRIA
+    if (estadoJogo.dia > DIAS_PARA_VENCER && !estadoJogo.fimDeJogo) {
+        estadoJogo.fimDeJogo = true;
+        displayMensagemVitoria.textContent = "Contra todas as probabilidades, você e sua família sobreviveram ao pior do apocalipse. Um novo começo os aguarda.";
+        displayContagemFinalDiasVitoria.textContent = estadoJogo.dia - 1;
+        mostrarTela('tela-vitoria');
+        return; // Termina a função aqui para mostrar a tela de vitória
+    }
+
     const jogoPodeContinuar = processarConsequenciasInicioDia();
     if (!jogoPodeContinuar) {
         atualizarInterface();
         return;
     }
 
-    if (estadoJogo.dia === 0) {
-        estadoJogo.dia = 1;
-    } else {
-        estadoJogo.dia++;
-    }
     registrarAtividadeEvento(`--- Início do Dia ${estadoJogo.dia} ---`);
     atualizarInterface();
 
@@ -810,13 +829,13 @@ function dispararEventoAleatorio() {
     displayTituloEvento.textContent = estadoJogo.eventoAtual.titulo;
     displayDescricaoEvento.textContent = typeof estadoJogo.eventoAtual.descricao === 'function' ? estadoJogo.eventoAtual.descricao() : estadoJogo.eventoAtual.descricao;
     placeholderImagemEvento.innerHTML = estadoJogo.eventoAtual.urlImagem
-        ? `<img src="${estadoJogo.eventoAtual.urlImagem}" alt="[Imagem do Evento: ${estadoJogo.eventoAtual.titulo}]" class="w-full h-full object-cover rounded-md" onerror="this.onerror=null; this.parentElement.textContent='[Imagem: ${estadoJogo.eventoAtual.titulo}]';">`
+        ? `<img src="${estadoJogo.eventoAtual.urlImagem}" alt="[Imagem do Evento: ${estadoJogo.eventoAtual.titulo}]" onerror="this.onerror=null; this.parentElement.textContent='[Imagem do Evento: ${estadoJogo.eventoAtual.titulo}]';">`
         : '[Placeholder Imagem do Evento]';
     displayEscolhasEvento.innerHTML = '';
     estadoJogo.eventoAtual.escolhas.forEach(escolha => {
         const botao = document.createElement('button');
         botao.textContent = escolha.texto;
-        botao.className = 'w-full text-left p-3 hover:bg-yellow-600 bg-opacity-70';
+        botao.className = 'botao-escolha-evento';
         botao.disabled = (typeof escolha.condicao === 'function' && !escolha.condicao());
         botao.onclick = () => {
             modalEvento.classList.add('oculto');
@@ -849,7 +868,11 @@ function habilitarDiario() {
         mostrarTela('tela-jogo');
         atualizarInterface();
     } else {
-        mostrarTela('tela-fim-de-jogo');
+        // Se o jogo acabou, mas não foi por vitória, mostra a tela de fim de jogo.
+        // A lógica de vitória já trata de mostrar a tela correta.
+        if (estadoJogo.telaAtual !== 'tela-vitoria') {
+           mostrarTela('tela-fim-de-jogo');
+        }
     }
 }
 
@@ -862,6 +885,7 @@ botoesVoltarSplash.forEach(b => b.addEventListener('click', () => mostrarTela('t
 botaoVoltarSplashDificuldade.addEventListener('click', () => mostrarTela('tela-splash'));
 botoesDificuldade.forEach(b => b.addEventListener('click', () => inicializarJogo(b.dataset.difficulty)));
 botaoReiniciarJogo.addEventListener('click', () => { mostrarTela('tela-splash'); });
+botaoJogarNovamenteVitoria.addEventListener('click', () => { mostrarTela('tela-splash'); }); // Evento para o novo botão
 botaoAbrirDiario.addEventListener('click', abrirDiarioAcoes);
 botaoFecharDiario.addEventListener('click', () => {
     modalDiarioAcoes.classList.add('oculto');
