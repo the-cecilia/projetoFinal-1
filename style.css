@@ -106,7 +106,8 @@ button:disabled, .botao-like:disabled {
 /* --- Tela de Dificuldade --- */
 #tela-dificuldade {
     background-image: url('img/tvBackground.jpg');
-    background-size: cover;
+    background-size: 100%;
+    background-repeat: no-repeat;
     background-position: center;
     align-items: center;
     justify-content: center;
